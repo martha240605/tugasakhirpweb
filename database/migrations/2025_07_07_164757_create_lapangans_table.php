@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nama');  
             $table->enum ('jenis', ['Badminton', 'Futsal', 'Voli', 'Tenis', 'Basket']);                   
-            $table->text('deskripsi')->nullable();      
+            $table->integer('harga_per_jam'); 
+            $table->text('deskripsi')->nullable();     
             $table->string('gambar')->nullable();       
             $table->enum('status', ['tersedia', 'disewa'])->default('tersedia'); 
-            $table->integer('harga_per_jam');
             $table->timestamps();
         });
     }
