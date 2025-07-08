@@ -12,7 +12,7 @@ class Lapangan extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'nama',
-        'type',
+        'jenis',
         'deskripsi',
         'gambar',
         'status',
