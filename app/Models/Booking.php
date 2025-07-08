@@ -27,4 +27,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Lapangan::class);
     }
+
+    public function transaksi()
+    {
+        return $this->hasOne(Transaksi::class);
+    }
 }
