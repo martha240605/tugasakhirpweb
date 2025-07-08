@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Lapangan;
+use App\Models\TimeSlot;
 
 class BookingController extends Controller
 {
@@ -19,6 +20,7 @@ class BookingController extends Controller
     public function create()
     {
         $lapangan = Lapangan::where('status', 'tersedia')->get();
+        $timeslot = TimeSlot::all();
         return view('user.booking.create', compact('lapangan'));
     }
 
@@ -26,19 +28,30 @@ class BookingController extends Controller
     {
         $request->validate([
             'lapangan_id' => 'required|exists:lapangan,id',
+            'time_slot_id' => 'required|exists:time_slots,id',
             'tanggal' => 'required|date',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
         ]);
+        $cek = Booking::where('tanggal', $request->tanggal)
+            ->where('lapangan_id', $request->lapangan_id)
+            ->where('time_slot_id', $request->time_slot_id)
+            ->exists();
+
+        if ($cek) {
+            return back()->with('error', 'Jam sudah dibooking!');
+        }
 
         $durasi = (strtotime($request->jam_selesai) - strtotime($request->jam_mulai)) / 3600;
 
         $lapangan = Lapangan::findOrFail($request->lapangan_id);
+        $timeslot = TimeSlot::findOrFail($request->time_slot_id);
         $totalHarga = $durasi * $lapangan->harga_per_jam;
 
         Booking::create([
             'user_id' => Auth::id(),
             'lapangan_id' => $lapangan->id,
+            'time_slot_id' => $timeslot->id,
             'tanggal' => $request->tanggal,
             'jam_mulai' => $request->jam_mulai,
             'jam_selesai' => $request->jam_selesai,

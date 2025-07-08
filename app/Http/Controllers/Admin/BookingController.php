@@ -1,17 +1,17 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class BookingController extends Controller
 {
-     public function index(Request $request)
+    public function index(Request $request)
     {
-        $query = Booking::with(['user', 'lapangan']);
+        $query = Booking::with(['user', 'lapangan', 'timeslot']);
 
-        // Filter berdasarkan status jika ada parameter 'status' di URL
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
@@ -26,7 +26,7 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
-        $booking->load(['user', 'lapangan']);
+        $booking->load(['user', 'lapangan', 'timeslot']);
         return view('admin.bookings.show', compact('booking'));
     }
 
@@ -45,5 +45,12 @@ class BookingController extends Controller
         ]);
 
         return redirect()->route('admin.bookings.index', $booking)->with('success', 'Status booking berhasil diperbarui!');
+    }
+
+    public function destroy(Booking $booking)
+    {
+        $booking->delete();
+
+        return redirect()->route('admin.bookings.index')->with('success', 'Booking berhasil dihapus.');
     }
 }
