@@ -32,4 +32,9 @@ class Booking extends Model
     {
         return $this->hasOne(Transaksi::class);
     }
+
+    public function timeSlot()
+{
+    return $this->belongsTo(TimeSlot::class);
+}
 }
