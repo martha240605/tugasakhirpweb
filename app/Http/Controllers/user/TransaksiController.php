@@ -13,26 +13,26 @@ class TransaksiController extends Controller
 {
     public function index()
     {
-        $transactions = Transaksi::whereHas('booking', function ($query) {
+        $transaksi = Transaksi::whereHas('booking', function ($query) {
             $query->where('user_id', Auth::id());
         })->with('booking.lapangan')->latest()->get();
 
-        return view('user.transaksi.index', compact('transactions'));
+        return view('user.transaksi.index', compact('transaksi'));
     }
 
     public function show($id)
     {
-        $transaction = Transaksi::with('booking.lapangan')
+        $transaksi = Transaksi::with('booking.lapangan')
             ->whereHas('booking', function ($query) {
                 $query->where('user_id', Auth::id());
             })->findOrFail($id);
 
-        return view('user.transaksi.show', compact('transaction'));
+        return view('user.transaksi.show', compact('transaksi'));
     }
 
     public function uploadBukti(Request $request, $id)
     {
-        $transaction = Transaksi::whereHas('booking', function ($query) {
+        $transaksi = Transaksi::whereHas('booking', function ($query) {
             $query->where('user_id', Auth::id());
         })->findOrFail($id);
 
@@ -40,13 +40,13 @@ class TransaksiController extends Controller
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($transaction->payment_proof) {
-            Storage::delete($transaction->payment_proof);
+        if ($transaksi->payment_proof) {
+            Storage::delete($transaksi->payment_proof);
         }
 
         $path = $request->file('payment_proof')->store('bukti_pembayaran');
 
-        $transaction->update([
+        $transaksi->update([
             'payment_proof' => $path,
             'payment_status' => 'menunggu_verifikasi',
             'payment_date' => now(),

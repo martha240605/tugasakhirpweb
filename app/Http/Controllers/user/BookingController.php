@@ -8,69 +8,91 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Lapangan;
 use App\Models\TimeSlot;
+use App\Models\Transaksi;
+use Illuminate\Support\Carbon;
 
 class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::where('user_id', Auth::id())->with('lapangan')->latest()->get();
+        $bookings = Booking::where('user_id', Auth::id())
+                          ->with(['lapangan', 'timeSlot', 'transaksi'])
+                          ->latest()
+                          ->get();
         return view('user.booking.index', compact('bookings'));
     }
 
     public function create()
     {
-        $lapangan = Lapangan::where('status', 'tersedia')->get();
-        $timeslot = TimeSlot::all();
-        return view('user.booking.create', compact('lapangan'));
+        $lapangans = Lapangan::where('status', 'tersedia')->get();
+        $timeSlots = TimeSlot::all();
+        return view('user.booking.create', compact('lapangans', 'timeSlots'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'lapangan_id' => 'required|exists:lapangan,id',
+            'lapangan_id' => 'required|exists:lapangans,id',
             'time_slot_id' => 'required|exists:time_slots,id',
-            'tanggal' => 'required|date',
-            'jam_mulai' => 'required|date_format:H:i',
-            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+            'tanggal' => 'required|date|after_or_equal:today',
+            'durasi' => 'required|integer|min:1',
         ]);
-        $cek = Booking::where('tanggal', $request->tanggal)
-            ->where('lapangan_id', $request->lapangan_id)
-            ->where('time_slot_id', $request->time_slot_id)
-            ->exists();
-
-        if ($cek) {
-            return back()->with('error', 'Jam sudah dibooking!');
-        }
-
-        $durasi = (strtotime($request->jam_selesai) - strtotime($request->jam_mulai)) / 3600;
 
         $lapangan = Lapangan::findOrFail($request->lapangan_id);
-        $timeslot = TimeSlot::findOrFail($request->time_slot_id);
-        $totalHarga = $durasi * $lapangan->harga_per_jam;
+        $timeSlot = TimeSlot::findOrFail($request->time_slot_id);
 
-        Booking::create([
+        $requestedStart = Carbon::parse($request->tanggal . ' ' . $timeSlot->jam_mulai);
+        $requestedEnd = $requestedStart->copy()->addHours($request->durasi);
+
+        $cekBentrok = Booking::where('lapangan_id', $request->lapangan_id)
+                             ->where('tanggal', $request->tanggal)
+                             ->where(function ($query) use ($requestedStart, $requestedEnd) {
+                                 $query->whereBetween('jam_mulai', [$requestedStart->format('H:i:s'), $requestedEnd->format('H:i:s')])
+                                       ->orWhereBetween('jam_selesai', [$requestedStart->format('H:i:s'), $requestedEnd->format('H:i:s')])
+                                       ->orWhere(function ($query) use ($requestedStart, $requestedEnd) {
+                                           $query->where('jam_mulai', '<=', $requestedStart->format('H:i:s'))
+                                                 ->where('jam_selesai', '>=', $requestedEnd->format('H:i:s'));
+                                       });
+                             })
+                             ->exists();
+
+        if ($cekBentrok) {
+            return back()->with('error', 'Waktu yang Anda pilih bentrok dengan booking lain di lapangan ini!');
+        }
+
+        $totalHargaBooking = $lapangan->harga_per_jam * $request->durasi;
+
+        $booking = Booking::create([
             'user_id' => Auth::id(),
             'lapangan_id' => $lapangan->id,
-            'time_slot_id' => $timeslot->id,
+            'time_slot_id' => $timeSlot->id,
             'tanggal' => $request->tanggal,
-            'jam_mulai' => $request->jam_mulai,
-            'jam_selesai' => $request->jam_selesai,
-            'durasi' => $durasi,
-            'total_harga' => $totalHarga,
+            'jam_mulai' => $timeSlot->jam_mulai,
+            'jam_selesai' => $requestedEnd->format('H:i:s'),
+            'durasi' => $request->durasi,
+            'total_harga' => $totalHargaBooking,
             'status' => 'pending',
         ]);
 
-        return redirect()->route('user.bookings.index')->with('success', 'Booking berhasil dibuat dan menunggu persetujuan admin.');
+        $transaksi = Transaksi::create([
+            'booking_id' => $booking->id,
+            'payment_method' => null,
+            'payment_proof' => null,
+            'payment_status' => 'pending',
+            'payment_date' => null,
+        ]);
+
+        return redirect()->route('user.transaksi.show', $transaksi->id)->with('success', 'Booking berhasil dibuat! Lanjutkan ke pembayaran.');
     }
 
     public function destroy(Booking $booking)
     {
         if ($booking->user_id != Auth::id() || $booking->status !== 'pending') {
-            return redirect()->back()->withErrors('Tidak bisa membatalkan booking ini.');
+            return redirect()->back()->withErrors('Tidak bisa membatalkan booking ini. Hanya booking dengan status "pending" milik Anda yang bisa dibatalkan.');
         }
 
         $booking->delete();
 
-        return redirect()->route('user.bookings.index')->with('success', 'Booking berhasil dibatalkan.');
+        return redirect()->route('user.booking.index')->with('success', 'Booking berhasil dibatalkan.');
     }
 }

@@ -17,12 +17,12 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+          'email' => 'test@example.com',
         ]);
 
         $this->call([
         TimeSlotSeeder::class,
-        // tambahkan seeder lain jika ada
+        LapanganSeeder::class
     ]);
     }
 }

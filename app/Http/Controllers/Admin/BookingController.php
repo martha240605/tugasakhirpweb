@@ -18,7 +18,7 @@ class BookingController extends Controller
 
         $bookings = $query->latest()->get();
 
-        return view('admin.bookings.index', compact('bookings'));
+        return view('admin.booking.index', compact('bookings'));
     }
 
     /**
@@ -27,7 +27,7 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking->load(['user', 'lapangan', 'timeslot']);
-        return view('admin.bookings.show', compact('booking'));
+        return view('admin.booking.show', compact('booking'));
     }
 
     /**
@@ -44,13 +44,13 @@ class BookingController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('admin.bookings.index', $booking)->with('success', 'Status booking berhasil diperbarui!');
+        return redirect()->route('admin.booking.index', $booking)->with('success', 'Status booking berhasil diperbarui!');
     }
 
     public function destroy(Booking $booking)
     {
         $booking->delete();
 
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking berhasil dihapus.');
+        return redirect()->route('admin.booking.index')->with('success', 'Booking berhasil dihapus.');
     }
 }

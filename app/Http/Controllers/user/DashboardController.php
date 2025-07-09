@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Transaksi;
+use App\Models\Lapangan;
 
 class DashboardController extends Controller
 {
@@ -15,10 +16,10 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $totalBooking = Booking::where('user_id', $user->id)->count();
-        $totalTransaction = Transaksi::whereHas('booking', function ($q) use ($user) {
+        $totalTransaksi = Transaksi::whereHas('booking', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->count();
-
-        return view('user.dashboard', compact('totalBooking', 'totalTransaction'));
+$lapangans = Lapangan::where('status', 'Tersedia')->paginate(9);
+        return view('user.dashboard', compact('totalBooking', 'totalTransaksi', 'lapangans'));
     }
 }

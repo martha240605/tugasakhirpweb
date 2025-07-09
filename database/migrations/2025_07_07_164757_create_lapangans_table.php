@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('harga_per_jam'); 
             $table->text('deskripsi')->nullable();     
             $table->string('gambar')->nullable();       
-            $table->enum('status', ['tersedia', 'disewa'])->default('tersedia'); 
+            $table->enum('status', ['Tersedia', 'Disewa'])->default('Tersedia'); 
             $table->timestamps();
         });
     }

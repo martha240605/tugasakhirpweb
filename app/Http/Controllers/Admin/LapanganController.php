@@ -26,13 +26,13 @@ class LapanganController extends Controller
             'jenis' => 'required',
             'deskripsi' => 'nullable|string',
             'harga_per_jam' => 'required|numeric|min:0',
-            'status' => ['required', 'string', Rule::in(['available', 'maintenance', 'booked'])],
+            'status' => 'required|in:Tersedia,Disewa',
             'image' => 'required|image',
         ]);
 
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('lapangan_images', 'public'); 
+        if ($request->hasFile('gambar')) {
+            $imagePath = $request->file('gambar')->store('lapangan_images', 'public'); 
         }
 
         Lapangan::create([
@@ -41,7 +41,7 @@ class LapanganController extends Controller
             'deskripsi' => $request->deskripsi,
             'harga_per_jam' => $request->harga_per_jam,
             'status' => $request->status,
-            'image' => $imagePath,
+            'gambar' => $imagePath,
         ]);
 
         return redirect()->route('admin.lapngan.index')->with('success', 'Lapangan berhasil ditambahkan!');
@@ -63,22 +63,22 @@ class LapanganController extends Controller
             'jenis' => 'required',
             'deskripsi' => 'nullable|string',
             'harga_per_jam' => 'required|numeric|min:0',
-            'status' => ['required', 'string', Rule::in(['available', 'maintenance', 'booked'])],
-            'image' => 'required|image',
+            'status' =>'required|in:Tersedia,Disewa',
+            'gambar' => 'required|image',
         ]);
 
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('lapangan_images', 'public'); 
+        if ($request->hasFile('gambar')) {
+            $imagePath = $request->file('gambar')->store('lapangan_images', 'public'); 
         }
         $cari = Lapangan:: find($id);
         $cari->update([
             'nama' => $request->nama,
             'jenis' => $request->jenis,
-            'deskripsi' => $request->deskripsi,
             'harga_per_jam' => $request->harga_per_jam,
+            'deskripsi' => $request->deskripsi,
             'status' => $request->status,
-            'image' => $imagePath,
+            'gambar' => $imagePath,
         ]);
 
     return redirect()->route('admin.lapangan.index')->with('success', 'Lapangan berhasil diperbarui!');

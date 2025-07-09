@@ -13,10 +13,10 @@ class Lapangan extends Model
     protected $fillable = [
         'nama',
         'jenis',
+        'harga_per_jam',
         'deskripsi',
         'gambar',
         'status',
-        'harga_per_jam',
     ];
 
     public function bookings()

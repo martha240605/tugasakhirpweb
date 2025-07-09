@@ -8,7 +8,7 @@ class Transaksi extends Model
 {
     use HasFactory;
 
-    protected $table = 'transactions';
+    protected $table = 'transaksis';
 
     protected $fillable = [
         'booking_id',
