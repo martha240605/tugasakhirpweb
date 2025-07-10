@@ -84,8 +84,8 @@
                 <div class="mb-6">
                     <label for="status" class="block text-sm font-medium text-gray-200 mb-2">Status</label>
                     <select name="status" id="status" class="form-select w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-green-500 focus:border-green-500 transition duration-150" required>
-                        <option value="tersedia" {{ old('status', $lapangan->status) == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
-                        <option value="disewa" {{ old('status', $lapangan->status) == 'disewa' ? 'selected' : '' }}>Disewa</option>
+                        <option value="Tersedia" {{ old('status', $lapangan->status) == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="Disewa" {{ old('status', $lapangan->status) == 'Disewa' ? 'selected' : '' }}>Disewa</option>
                     </select>
                     @error('status')
                         <p class="mt-2 text-sm text-red-400">{{ $message }}</p>

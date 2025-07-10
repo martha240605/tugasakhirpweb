@@ -10,14 +10,14 @@ class TransaksiController extends Controller
 {
      public function index()
     {
-        $transaksi = Transaksi::with('booking.user')->latest()->get();
-        return view('admin.transaksi.index', compact('transaksi'));
+        $transaksis = Transaksi::with(['booking.user', 'booking.lapangan'])->latest()->get();
+        return view('admin.transaksi.create', compact('transaksis'));
     }
 
     public function create()
     {
         $bookings = Booking::with('user')->get();
-        return view('admin.transaksi.create', compact('bookings'));
+        return view('admin.transaksi.show', compact('bookings'));
     }
 
     public function store(Request $request)

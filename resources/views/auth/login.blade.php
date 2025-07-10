@@ -26,7 +26,7 @@ use App\Providers\RouteServiceProvider;
             <form method="POST" action="{{ route('login') }}" class="space-y-6 relative">
                 @csrf
 
-                {{-- Email Field --}}
+                
                 <div class="space-y-2">
                     <x-input-label for="email" :value="__('Email Address')" class="text-white font-semibold text-sm" />
                     <div class="relative">
@@ -41,7 +41,7 @@ use App\Providers\RouteServiceProvider;
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-400" />
                 </div>
 
-                {{-- Password Field --}}
+                
                 <div class="space-y-2">
                     <x-input-label for="password" :value="__('Password')" class="text-white font-semibold text-sm" />
                     <div class="relative">

@@ -27,7 +27,7 @@ class LapanganController extends Controller
             'deskripsi' => 'nullable|string',
             'harga_per_jam' => 'required|numeric|min:0',
             'status' => 'required|in:Tersedia,Disewa',
-            'image' => 'required|image',
+            'gambar' => 'required|image',
         ]);
 
         $imagePath = null;
@@ -44,7 +44,7 @@ class LapanganController extends Controller
             'gambar' => $imagePath,
         ]);
 
-        return redirect()->route('admin.lapngan.index')->with('success', 'Lapangan berhasil ditambahkan!');
+        return redirect()->route('admin.lapangan.index')->with('success', 'Lapangan berhasil ditambahkan!');
     }
     public function edit(string $id)
     {
@@ -89,9 +89,7 @@ class LapanganController extends Controller
      */
     public function destroy(string $id)
     {
-        $cari = Lapangan:: find($id);
-        $cari->delete();
-        return redirect()->route('produk.index')->with('success', 'Lapangan berhasil dihapus!');
+         Lapangan::destroy($id);
+    return redirect()->route('admin.lapangan.index')->with('success', 'Lapangan berhasil dihapus!');
     }
-
 }

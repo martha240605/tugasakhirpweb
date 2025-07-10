@@ -20,17 +20,29 @@ class TransaksiController extends Controller
         return view('user.transaksi.index', compact('transaksi'));
     }
 
-    public function show($id)
+    public function create($booking_id)
     {
-        $transaksi = Transaksi::with('booking.lapangan')
-            ->whereHas('booking', function ($query) {
-                $query->where('user_id', Auth::id());
-            })->findOrFail($id);
+        $booking = Booking::where('user_id', Auth::id())->findOrFail($booking_id);
 
-        return view('user.transaksi.show', compact('transaksi'));
+        $transaksi = Transaksi::firstOrCreate(
+            ['booking_id' => $booking->id],
+            [
+                'payment_method' => 'transfer',
+                'payment_status' => 'pending',
+                'payment_proof' => null,
+                'payment_date' => null,
+            ]
+        );
+
+        return view('user.transaksi.upload', compact('booking', 'transaksi'));
     }
 
-    public function uploadBukti(Request $request, $id)
+    public function show($id)
+    {
+        
+    }
+
+    public function uploadbukti(Request $request, $id)
     {
         $transaksi = Transaksi::whereHas('booking', function ($query) {
             $query->where('user_id', Auth::id());
@@ -52,6 +64,7 @@ class TransaksiController extends Controller
             'payment_date' => now(),
         ]);
 
-        return redirect()->route('user.transaksi.index')->with('success', 'Bukti pembayaran berhasil diupload.');
+        return redirect()->route('user.dashboard')->with('success', 'Pembayaran berhasil diupload.');
+
     }
 }

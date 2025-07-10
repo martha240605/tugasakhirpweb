@@ -58,7 +58,6 @@
                 <h4 class="text-xl font-semibold text-gray-100 mb-3">Ubah Status Booking:</h4>
                 <form action="{{ route('admin.booking.index', $booking->id) }}" method="POST">
                     @csrf
-                    @method('PUT')
                     <div class="mb-4">
                         <label for="status" class="block text-gray-300 text-sm font-bold mb-2">Status:</label>
                         <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-600 text-white leading-tight focus:outline-none focus:shadow-outline focus:ring-green-500 focus:border-green-500 @error('status') border-red-500 @enderror" required>
@@ -88,7 +87,7 @@
             <div class="bg-gray-700 p-6 rounded-lg shadow-inner border border-gray-600/50">
                 <h4 class="text-xl font-semibold text-gray-100 mb-3">Hapus Booking:</h4>
                 <p class="text-gray-300 mb-4">Hapus booking ini secara permanen dari sistem.</p>
-                <form action="{{ route('admin.bookings.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus booking ini secara permanen?');">
+                <form action="{{ route('admin.booking.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus booking ini secara permanen?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
@@ -99,7 +98,7 @@
         </div>
 
         <div class="mt-8 text-center">
-            <a href="{{ route('admin.bookings.index') }}" class="inline-flex items-center px-6 py-3 border border-gray-600 rounded-md font-semibold text-sm text-gray-300 uppercase tracking-widest bg-gray-700 hover:bg-gray-600 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 transition ease-in-out duration-150">
+            <a href="{{ route('admin.booking.index') }}" class="inline-flex items-center px-6 py-3 border border-gray-600 rounded-md font-semibold text-sm text-gray-300 uppercase tracking-widest bg-gray-700 hover:bg-gray-600 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 transition ease-in-out duration-150">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Booking
             </a>
         </div>

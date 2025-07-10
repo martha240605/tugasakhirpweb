@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Middleware\AdminMiddleware; 
 use App\Http\Middleware\UserMiddleware; 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ComprehensiveReportController as AdminComprehensiveReportController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -44,13 +45,20 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
     Route::resource('lapangan', AdminLapanganController::class);
     Route::resource('booking', AdminBookingController::class);
     Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::delete('booking/{booking}', [AdminUserController::class, 'destroy'])->name('booking.destroy');
     Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/laporan', [AdminComprehensiveReportController::class, 'index'])->name('laporan.index');
+     Route::get('/laporan/generate', [AdminComprehensiveReportController::class, 'cetak'])->name('laporan.cetak');
 });
 
 Route::middleware(['auth', UserMiddleware::class])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     Route::resource('booking', UserBookingController::class);
     Route::resource('transaksi', UserTransaksiController::class);
+    Route::put('/booking/{id}', [UserBookingController::class, 'edit'])->name('user.booking.edit');
+
 });
+Route::get('/user/transaksi/create/{booking_id}', [UserTransaksiController::class, 'create'])->name('user.transaksi.create');
+Route::get('/user/transaksi/upload/{booking_id}', [UserTransaksiController::class, 'uploadbukti'])->name('user.transaksi.uploadbukti');
 
 require __DIR__.'/auth.php';
